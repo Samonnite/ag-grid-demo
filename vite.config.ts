@@ -7,6 +7,6 @@ export default defineConfig({
   base: './',
   build: {
     // Relative to the root
-    outDir: "../build",
+    outDir: "./build",
   },
 })
