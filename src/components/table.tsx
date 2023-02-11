@@ -105,8 +105,8 @@ const AgTable = () => {
       cellRendererParams: {
         sparklineOptions: {
           type: "column",
-          fill: "#91cc75",
-          stroke: "#91cc75",
+          fill: "#94b2d0",
+          stroke: "#94b2d0",
           highlightStyle: {
             fill: "orange",
           },
