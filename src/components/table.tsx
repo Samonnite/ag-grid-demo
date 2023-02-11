@@ -12,10 +12,8 @@ import { LicenseManager } from "ag-grid-enterprise";
 import "ag-grid-community/styles/ag-grid.css"; // Core grid CSS, always needed
 import "ag-grid-community/styles/ag-theme-alpine.css"; // Optional theme CSS
 
-LicenseManager.setLicenseKey(
-  "key"
-);
-const ColorCellRenderer = (props) => {
+LicenseManager.setLicenseKey(import.meta.env.VITE_LICENSE_KEY);
+const ColorCellRenderer = (props: any) => {
   const ARROW_UP = "\u2191";
   const ARROW_DOWN = "\u2193";
   const [lastValue, setLastValue] = useState(0);
@@ -42,9 +40,10 @@ const ColorCellRenderer = (props) => {
   );
 };
 const AgTable = () => {
-  const UPDATE_COUNT = 50;
+  const UPDATE_COUNT = 100;
+  const DATA_COUNT = 500;
   let nextTradeId = 24287;
-  const gridRef = useRef(); // Optional - for accessing Grid's API
+  const gridRef = useRef<any>(); // Optional - for accessing Grid's API
   const [rowData, setRowData] = useState<any>([]); // Set rowData to Array of Objects, one Object per Row
 
   const numberCellFormatter = (params: any) => {
@@ -186,7 +185,7 @@ const AgTable = () => {
   ]);
 
   const getRowId = useMemo(() => {
-    return ({ data }) => data.trade;
+    return ({ data }: any) => data.trade;
   }, []);
 
   const createTradeId = () => {
@@ -252,15 +251,15 @@ const AgTable = () => {
         newItem.pl1 = Array.from({ length: 10 }, () =>
           randomBetween(100, 1000)
         );
-        newItem.dealType=Math.random() < 0.2 ? "Physical" : "Financial";
-        newItem.bidFlag=Math.random() < 0.5 ? "Buy" : "Sell";
-        newItem.pl2=randomBetween(100, 1000);
-        newItem.gainDx= randomBetween(100, 1000);
-        newItem.sxPx= randomBetween(100, 1000);
-        newItem._99Out= randomBetween(100, 1000);
+        newItem.dealType = Math.random() < 0.2 ? "Physical" : "Financial";
+        newItem.bidFlag = Math.random() < 0.5 ? "Buy" : "Sell";
+        newItem.pl2 = randomBetween(100, 1000);
+        newItem.gainDx = randomBetween(100, 1000);
+        newItem.sxPx = randomBetween(100, 1000);
+        newItem._99Out = randomBetween(100, 1000);
         newItems.push(newItem);
       }
-      gridRef.current!.api.applyTransaction({ update: newItems });
+      (gridRef.current as any).api.applyTransaction({ update: newItems });
     }, 500);
   };
 
@@ -274,13 +273,13 @@ const AgTable = () => {
   );
 
   // Example of consuming Grid Event
-  const cellClickedListener = useCallback((event) => {
+  const cellClickedListener = useCallback((event:any) => {
     console.log("cellClicked", event);
   }, []);
 
   const createRowData = () => {
     const data = [];
-    for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < DATA_COUNT; i++) {
       const trade = createTradeRecord();
       data.push(trade);
     }
