@@ -33,16 +33,16 @@ const ColorCellRenderer = (props: any) => {
         color: lastValue > props.value ? "#46e372" : "#ff005c",
       }}
     >
-      {lastValue > props.value
-        ? ARROW_DOWN + props.value
-        : ARROW_UP + props.value}
+      {lastValue < props.value
+        ?  "-" +props.value
+        : props.value}
     </span>
   );
 };
 const AgTable = () => {
   const UPDATE_COUNT = 100;
   const DATA_COUNT = 500;
-  let nextTradeId = 24287;
+  let nextTradeId = 310820;
   const gridRef = useRef<any>(); // Optional - for accessing Grid's API
   const [rowData, setRowData] = useState<any>([]); // Set rowData to Array of Objects, one Object per Row
 
@@ -55,11 +55,52 @@ const AgTable = () => {
   // Each Column Definition results in one Column.
   const [columnDefs, setColumnDefs] = useState([
     // these are the row groups, so they are all hidden (they are show in the group column)
-    { headerName: "ID", field: "trade", width: 160, rowDrag: true },
+    { headerName: "用户", field: "trade", width: 160, rowDrag: true, headerCheckboxSelection: true,checkboxSelection: true, },
 
     // all the other columns (visible and not grouped)
     {
-      headerName: "income",
+      headerName: "订单号",
+      field: "previous",
+      width: 200,
+      aggFunc: "sum",
+      enableValue: true,
+    },
+    {
+      headerName: "交易品种",
+      field: "dealType",
+      enableRowGroup: true,
+      enablePivot: true,
+    },
+    {
+      headerName: "持仓手数",
+      field: "bidFlag",
+      enableRowGroup: true,
+      enablePivot: true,
+      width: 150,
+    },
+    {
+      headerName: "开仓价",
+      field: "pl2",
+      width: 200,
+      aggFunc: "sum",
+      enableValue: true,
+    },
+    {
+      headerName: "开仓方向",
+      field: "bidFlag2",
+      enableRowGroup: true,
+      enablePivot: true,
+      width: 140,
+    },
+    {
+      headerName: "保证金",
+      field: "sxPx",
+      width: 180,
+      aggFunc: "sum",
+      enableValue: true,
+    },
+    {
+      headerName: "收益",
       field: "current",
       width: 200,
       aggFunc: "sum",
@@ -75,82 +116,27 @@ const AgTable = () => {
       },
     },
     {
-      headerName: "Previous",
-      field: "previous",
+      headerName: "收益率",
+      field: "current2",
       width: 200,
       aggFunc: "sum",
       enableValue: true,
       cellClass: "number",
       valueFormatter: numberCellFormatter,
-      cellRenderer: "agAnimateShowChangeCellRenderer",
-      // cellRendererParams: {
-      //   borderRadius: "20px",
-      //   padding: " 5px 12px",
-      // },
-    },
-    {
-      headerName: "Deal Type",
-      field: "dealType",
-      enableRowGroup: true,
-      enablePivot: true,
-    },
-    {
-      headerName: "line",
-      field: "pl1",
-      width: 200,
-      aggFunc: "sum",
-      enableValue: true,
-      cellClass: "number",
-      cellRenderer: "agSparklineCellRenderer",
+      // cellRenderer: "agAnimateShowChangeCellRenderer",
+      cellRenderer: ColorCellRenderer,
+      // sort: "desc",
       cellRendererParams: {
-        sparklineOptions: {
-          type: "column",
-          fill: "#94b2d0",
-          stroke: "#94b2d0",
-          highlightStyle: {
-            fill: "orange",
-          },
-          paddingInner: 0.3,
-          paddingOuter: 0.1,
-        },
+        borderRadius: "20px",
+        padding: " 5px 12px",
       },
     },
     {
-      headerName: "Bid",
-      field: "bidFlag",
-      enableRowGroup: true,
-      enablePivot: true,
-      width: 100,
-    },
-    {
-      headerName: "PL 2",
-      field: "pl2",
-      width: 200,
-      aggFunc: "sum",
-      enableValue: true,
-      cellClass: "number",
-      valueFormatter: numberCellFormatter,
-      cellRenderer: "agAnimateSlideCellRenderer",
-    },
-    {
-      headerName: "Gain-DX",
+      headerName: "跟单",
       field: "gainDx",
       width: 200,
       aggFunc: "sum",
       enableValue: true,
-      cellClass: "number",
-      valueFormatter: numberCellFormatter,
-      cellRenderer: "agAnimateShowChangeCellRenderer",
-    },
-    {
-      headerName: "SX / PX",
-      field: "sxPx",
-      width: 200,
-      aggFunc: "sum",
-      enableValue: true,
-      cellClass: "number",
-      valueFormatter: numberCellFormatter,
-      cellRenderer: "agAnimateSlideCellRenderer",
     },
     {
       headerName: "99 Out",
@@ -195,19 +181,22 @@ const AgTable = () => {
 
   const createTradeRecord = () => {
     var current = Math.floor(Math.random() * 100000) + 100;
-    var previous = current + Math.floor(Math.random() * 10000) - 2000;
+    var current2 = (Math.random() * 100).toFixed(2) + '%';
+    var previous = Math.floor(Math.random() * 1000000000);
     var trade = {
       trade: createTradeId(),
       submitterID: randomBetween(10, 1000),
       submitterDealID: randomBetween(10, 1000),
-      dealType: Math.random() < 0.2 ? "Physical" : "Financial",
-      bidFlag: Math.random() < 0.5 ? "Buy" : "Sell",
+      dealType: Math.random() < 0.2 ? "BTC/USD" : Math.random() > 0.6 ? "GBP/USD" : "EUR/USD",
+      bidFlag: Math.random().toFixed(1),
+      bidFlag2: Math.random() < 0.2 ? "做多" : "做空",
       current: current,
+      current2,
       previous: previous,
       pl1: Array.from({ length: 10 }, () => randomBetween(100, 1000)),
-      pl2: randomBetween(100, 1000),
-      gainDx: randomBetween(100, 1000),
-      sxPx: randomBetween(100, 1000),
+      pl2: (Math.random() * 100).toFixed(6),
+      gainDx: Math.random() < 0.2 ? "是" : "否",
+      sxPx: (Math.random() * 10000).toFixed(2),
       _99Out: randomBetween(100, 1000),
     };
     return trade;
@@ -244,23 +233,13 @@ const AgTable = () => {
         }
         var itemToUpdate = rowData[index];
         var newItem = copyObject(itemToUpdate);
-        // copy previous to current value
-        newItem.previous = newItem.current;
         // then create new current value
         newItem.current = Math.floor(Math.random() * 100000) + 100;
-        newItem.pl1 = Array.from({ length: 10 }, () =>
-          randomBetween(100, 1000)
-        );
-        newItem.dealType = Math.random() < 0.2 ? "Physical" : "Financial";
-        newItem.bidFlag = Math.random() < 0.5 ? "Buy" : "Sell";
-        newItem.pl2 = randomBetween(100, 1000);
-        newItem.gainDx = randomBetween(100, 1000);
-        newItem.sxPx = randomBetween(100, 1000);
-        newItem._99Out = randomBetween(100, 1000);
+        newItem.current2 = (Math.random() * 100).toFixed(2) + '%';
         newItems.push(newItem);
       }
       (gridRef.current as any).api.applyTransaction({ update: newItems });
-    }, 500);
+    }, 800);
   };
 
   // DefaultColDef sets props common to all Columns
